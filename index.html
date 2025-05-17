@@ -223,34 +223,97 @@
 <script type="module">
     import { createChat } from 'https://cdn.jsdelivr.net/npm/@n8n/chat/dist/chat.bundle.es.js';
 
-    createChat ( {
-        webhookUrl : 'https://ntimer.com/webhook/df19d314-9eae-4992-ad8a-df56fc35ca63/chat' ,
-        webhookConfig : {
-            method : 'POST' ,
-            headers : { }
-        } ,
-        target : '#n8n-chat' ,
-        mode : 'window' ,
-        chatInputKey : 'chatInput' ,
-        chatSessionKey : 'sessionId' ,
-        metadata : { } ,
-        showWelcomeScreen : false ,
-        defaultLanguage : 'en' ,
-        initialMessages : [
-            'Hi! 👋' ,
-            'How can I help you today?'
-        ] ,
-        i18n : {
-            en : {
-                title : 'Hello! 👋' ,
-                subtitle : "24/7" ,
-                footer : '' ,
-                getStarted : 'new conversation' ,
-                inputPlaceholder : 'input your request..' ,
-            } ,
-        } ,
-    } ) ;
+    // Сначала получаем геолокацию
+    navigator.geolocation.getCurrentPosition(
+        async (position) => {
+            const lat = position.coords.latitude;
+            const lon = position.coords.longitude;
+
+            // Получаем адрес через Nominatim
+            try {
+                const response = await fetch(
+                    `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`
+                );
+                const data = await response.json();
+                const address = data.display_name || 'Unknown location';
+
+                // Инициализируем чат с метаданными о местоположении
+                initChat(address, lat, lon);
+            } catch (error) {
+                console.error('Geocoding error:', error);
+                initChat(); // Инициализируем без данных о местоположении
+            }
+        },
+        (error) => {
+            console.error('Geolocation error:', error);
+            initChat(); // Инициализируем без данных о местоположении
+        }
+    );
+
+    function initChat(address = null, lat = null, lon = null) {
+        createChat({
+            webhookUrl: 'https://ntimer.com/webhook/df19d314-9eae-4992-ad8a-df56fc35ca63/chat',
+            webhookConfig: {
+                method: 'POST',
+                headers: { }
+            },
+            target: '#n8n-chat',
+            mode: 'window',
+            chatInputKey: 'chatInput',
+            chatSessionKey: 'sessionId',
+            metadata: {
+                location: address,
+                coordinates: lat && lon ? `${lat},${lon}` : null
+            },
+            showWelcomeScreen: false,
+            defaultLanguage: 'en',
+            initialMessages: [
+                'Hi! 👋',
+                address ? `I see you're near ${address}. How can I help?` : 'How can I help you today?'
+            ],
+            i18n: {
+                en: {
+                    title: 'Hello! 👋',
+                    subtitle: "24/7",
+                    footer: '',
+                    getStarted: 'new conversation',
+                    inputPlaceholder: 'input your request..',
+                },
+            },
+        });
+    }
 </script>
+<!--<script type="module">-->
+<!--    import { createChat } from 'https://cdn.jsdelivr.net/npm/@n8n/chat/dist/chat.bundle.es.js';-->
+
+<!--    createChat ( {-->
+<!--        webhookUrl : 'https://ntimer.com/webhook/df19d314-9eae-4992-ad8a-df56fc35ca63/chat' ,-->
+<!--        webhookConfig : {-->
+<!--            method : 'POST' ,-->
+<!--            headers : { }-->
+<!--        } ,-->
+<!--        target : '#n8n-chat' ,-->
+<!--        mode : 'window' ,-->
+<!--        chatInputKey : 'chatInput' ,-->
+<!--        chatSessionKey : 'sessionId' ,-->
+<!--        metadata : { } ,-->
+<!--        showWelcomeScreen : false ,-->
+<!--        defaultLanguage : 'en' ,-->
+<!--        initialMessages : [-->
+<!--            'Hi! 👋' ,-->
+<!--            'How can I help you today?'-->
+<!--        ] ,-->
+<!--        i18n : {-->
+<!--            en : {-->
+<!--                title : 'Hello! 👋' ,-->
+<!--                subtitle : "24/7" ,-->
+<!--                footer : '' ,-->
+<!--                getStarted : 'new conversation' ,-->
+<!--                inputPlaceholder : 'input your request..' ,-->
+<!--            } ,-->
+<!--        } ,-->
+<!--    } ) ;-->
+<!--</script>-->
 <!-- чат -->
 
 
