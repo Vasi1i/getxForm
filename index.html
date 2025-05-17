@@ -13,16 +13,31 @@
 <!--    <link rel="icon" href="favicon.ico" type="image/x-icon">-->
 </head>
 <body>
+
+<script>
+    window.onload = function() {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                function(position) {
+                    document.getElementById("coordinates").innerHTML =
+                        "Широта: " + position.coords.latitude +
+                        "<br>Долгота: " + position.coords.longitude;
+                },
+                function(error) {
+                    document.getElementById("coordinates").innerHTML =
+                        "Ошибка: " + error.message;
+                }
+            );
+        } else {
+            document.getElementById("coordinates").innerHTML =
+                "Ваш браузер не поддерживает геолокацию";
+        }
+    };
+</script>
 <!-- Шапка страницы -->
 <header>
     <h1>Chat x</h1>
-<!--    <nav>-->
-<!--        <ul>-->
-<!--            <li><a href="#section1">Раздел 1</a></li>-->
-<!--            <li><a href="#section2">Раздел 2</a></li>-->
-<!--            <li><a href="#section3">Раздел 3</a></li>-->
-<!--        </ul>-->
-<!--    </nav>-->
+
 </header>
 
 
@@ -37,20 +52,7 @@
 
 <!-- Основной контент -->
 <main>
-<!--    <section id="section1">-->
-<!--        <h2>Раздел 1</h2>-->
-<!--        <p>Текст первого раздела.</p>-->
-<!--    </section>-->
 
-<!--    <section id="section2">-->
-<!--        <h2>Раздел 2</h2>-->
-<!--        <p>Текст второго раздела.</p>-->
-<!--    </section>-->
-
-<!--    <section id="section3">-->
-<!--        <h2>Раздел 3</h2>-->
-<!--        <p>Текст третьего раздела.</p>-->
-<!--    </section>-->
 </main>
 
 <!-- Подвал страницы -->
