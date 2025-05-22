@@ -40,35 +40,193 @@
 </header>
 
 <body>
-<p id="coordinates">Получаем координаты...</p>
-<p id="location">Определяем местоположение...</p>
+<!--<p id="coordinates">Получаем координаты...</p>-->
+<!--<p id="location">Определяем местоположение...</p>-->
+
+
+<!-- Контейнер для координат -->
+<div id="fake-coordinates">Generating random Dunstable coordinates...</div>
+<div id="fake-location">Converting coordinates to location...</div>
+<!--<p><a id="map-link" target="_blank" rel="noopener">View on OpenStreetMap</a></p>-->
+
+<!-- Контейнер для карты -->
+<div id="map" style="height: 400px; width: 100%; margin-top: 20px;"></div>
+
+<!-- Подключаем Leaflet -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script>
+    // Глобальные переменные
+    let randomLat = null;
+    let randomLng = null;
+    let randomAdr = null;
+
+    // Границы Dunstable
+    const DUNSTABLE = {
+        latMin: 51.880,
+        latMax: 51.900,
+        lonMin: -0.535,
+        lonMax: -0.505
+    };
+
+    // Генерация случайной точки
+    function getRandomLocation() {
+        return {
+            lat: DUNSTABLE.latMin + Math.random() * (DUNSTABLE.latMax - DUNSTABLE.latMin),
+            lng: DUNSTABLE.lonMin + Math.random() * (DUNSTABLE.lonMax - DUNSTABLE.lonMin)
+        };
+    }
+
+    // Обратное геокодирование
+    function fetchAddress(lat, lng) {
+        const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`;
+
+        fetch(url, {
+            headers: {
+                'User-Agent': 'RandomDunstableMap/1.0'
+            }
+        })
+            .then(response => response.json())
+            .then(data => {
+                randomAdr = data.display_name || "Address not found";
+                console.log("Определенный адрес:", randomAdr);
+
+                // Вставляем адрес в #fake-location
+                document.getElementById("fake-location").textContent = `Location: ${randomAdr}`;
+            })
+            .catch(error => {
+                console.error("Ошибка при получении адреса:", error);
+                document.getElementById("fake-location").textContent = "Failed to get address.";
+            });
+    }
+
+
+    // Инициализация карты и маркера
+    function initMap() {
+        const map = L.map('map').setView([51.886, -0.522], 13);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+        const randomLoc = getRandomLocation();
+        randomLat = randomLoc.lat;
+        randomLng = randomLoc.lng;
+
+        L.marker([randomLat, randomLng])
+            .addTo(map)
+            .bindPopup("Random location in Dunstable")
+            .openPopup();
+
+        map.setView([randomLat, randomLng], 13);
+
+        document.getElementById("fake-coordinates").textContent =
+            `Random Dunstable point: ${randomLat.toFixed(6)}, ${randomLng.toFixed(6)}`;
+
+        // document.getElementById("map-link").href =
+        //     `https://www.openstreetmap.org/?mlat=${randomLat}&mlon=${randomLng}&zoom=15`;
+
+        // Получаем адрес
+        fetchAddress(randomLat, randomLng);
+    }
+
+    window.addEventListener('DOMContentLoaded', initMap);
+</script>
+
+
+<!--<script>-->
+<!--    // Глобальные переменные-->
+<!--    let randomLat = null;-->
+<!--    let randomLng = null;-->
+
+<!--    // Границы Dunstable-->
+<!--    const DUNSTABLE = {-->
+<!--        latMin: 51.880,-->
+<!--        latMax: 51.900,-->
+<!--        lonMin: -0.535,-->
+<!--        lonMax: -0.505-->
+<!--    };-->
+
+<!--    // Генерация случайной точки-->
+<!--    function getRandomLocation() {-->
+<!--        return {-->
+<!--            lat: DUNSTABLE.latMin + Math.random() * (DUNSTABLE.latMax - DUNSTABLE.latMin),-->
+<!--            lng: DUNSTABLE.lonMin + Math.random() * (DUNSTABLE.lonMax - DUNSTABLE.lonMin)-->
+<!--        };-->
+<!--    }-->
+
+<!--    // Инициализация карты и маркера-->
+<!--    function initMap() {-->
+<!--        const map = L.map('map').setView([51.886, -0.522], 13);-->
+
+<!--        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {-->
+<!--            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'-->
+<!--        }).addTo(map);-->
+
+<!--        // Генерируем случайную точку и сохраняем в глобальные переменные-->
+<!--        const randomLoc = getRandomLocation();-->
+<!--        randomLat = randomLoc.lat;-->
+<!--        randomLng = randomLoc.lng;-->
+
+<!--        // Добавляем маркер-->
+<!--        const marker = L.marker([randomLat, randomLng])-->
+<!--            .addTo(map)-->
+<!--            .bindPopup("Random location in Dunstable")-->
+<!--            .openPopup();-->
+
+<!--        map.setView([randomLat, randomLng], 13);-->
+
+<!--        // Обновляем текст и ссылку-->
+<!--        document.getElementById("fake-coordinates").textContent =-->
+<!--            `Random Dunstable point: ${randomLat.toFixed(6)}, ${randomLng.toFixed(6)}`;-->
+
+<!--        document.getElementById("map-link").href =-->
+<!--            `https://www.openstreetmap.org/?mlat=${randomLat}&mlon=${randomLng}&zoom=15`;-->
+<!--    }-->
+
+<!--    window.addEventListener('DOMContentLoaded', initMap);-->
+<!--</script>-->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
 <!-- Место для карты -->
 <!--<div id="map" style="width: 800px; height: 500px; border: 1px solid #ccc;"></div>-->
-<div id="map"></div>
+<!--<div id="map"></div>-->
 
-<!-- Подключаем скрипт Leaflet -->
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<!--&lt;!&ndash; Подключаем скрипт Leaflet &ndash;&gt;-->
+<!--<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>-->
 
-<!-- Инициализация карты -->
-<script>
-    const map = L.map('map').setView([51.886102427616734, -0.5216997222963081], 13);
-    // const map = L.map('map').setView([55.751244, 37.618423], 13);
+<!--&lt;!&ndash; Инициализация карты &ndash;&gt;-->
+<!--<script>-->
+<!--    const map = L.map('map').setView([51.886102427616734, -0.5216997222963081], 13);-->
 
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-    }).addTo(map);
+<!--    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {-->
+<!--        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'-->
+<!--    }).addTo(map);-->
 
-    // Добавим маркер (опционально)
-    // L.marker([55.751244, 37.618423])
-    //     .addTo(map)
-    //     .bindPopup("Москва, Кремль");
-    L.marker([51.886102427616734, -0.5216997222963081])
-        .addTo(map)
-        .bindPopup("Dunstable");
-</script>
+<!--    L.marker([51.886102427616734, -0.5216997222963081])-->
+<!--        .addTo(map)-->
+<!--        .bindPopup("Dunstable");-->
+<!--</script>-->
 
 <!--google map-->
 <!--<div id="map" style="width:100%; height:350px; margin-top:20px; border:1px solid #ddd;">-->
@@ -209,16 +367,250 @@
         --chat--toggle--size: 100px;
     }
 </style>
+
+
+
+<!--without message print-->
+<!--<script type="module">-->
+<!--    import { createChat } from 'https://cdn.jsdelivr.net/npm/@n8n/chat/dist/chat.bundle.es.js';-->
+
+<!--    // Сначала получаем геолокацию-->
+<!--    navigator.geolocation.getCurrentPosition(-->
+<!--        async (position) => {-->
+<!--            const lat = position.coords.latitude;-->
+<!--            const lon = position.coords.longitude;-->
+
+<!--            // Получаем адрес через Nominatim-->
+<!--            try {-->
+<!--                const response = await fetch(-->
+<!--                    `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`-->
+<!--                );-->
+<!--                const data = await response.json();-->
+<!--                const address = data.display_name || 'Unknown location';-->
+
+<!--                // Инициализируем чат с метаданными о местоположении-->
+<!--                initChat(address, lat, lon);-->
+<!--            } catch (error) {-->
+<!--                console.error('Geocoding error:', error);-->
+<!--                initChat(); // Инициализируем без данных о местоположении-->
+<!--            }-->
+<!--        },-->
+<!--        (error) => {-->
+<!--            console.error('Geolocation error:', error);-->
+<!--            initChat(); // Инициализируем без данных о местоположении-->
+<!--        }-->
+<!--    );-->
+
+<!--    function initChat(address = null, lat = null, lon = null) {-->
+<!--        createChat({-->
+<!--            webhookUrl: 'https://ntimer.com/webhook/df19d314-9eae-4992-ad8a-df56fc35ca63/chat',-->
+<!--            webhookConfig: {-->
+<!--                method: 'POST',-->
+<!--                headers: { }-->
+<!--            },-->
+<!--            target: '#n8n-chat',-->
+<!--            mode: 'window',-->
+<!--            chatInputKey: 'chatInput',-->
+<!--            chatSessionKey: 'sessionId',-->
+<!--            metadata: {-->
+<!--                location: address,-->
+<!--                coordinates: lat && lon ? `${lat},${lon}` : null-->
+<!--            },-->
+<!--            showWelcomeScreen: false,-->
+<!--            defaultLanguage: 'en',-->
+<!--            initialMessages: [-->
+<!--                // 'Hi! 👋',-->
+<!--                address ? `I see you're near ${address}` : 'Address not found'-->
+<!--            ],-->
+<!--            i18n: {-->
+<!--                en: {-->
+<!--                    title: 'Hello! 👋',-->
+<!--                    subtitle: "",-->
+<!--                    footer: '',-->
+<!--                    getStarted: 'new conversation',-->
+<!--                    inputPlaceholder: 'input your request..',-->
+<!--                },-->
+<!--            },-->
+
+<!--        });-->
+
+
+<!--    }-->
+<!--</script>-->
+
+
+
+<!--without message originator-->
+<!--correct ver -->
+<!--<script type="module">-->
+<!--    import { createChat } from 'https://cdn.jsdelivr.net/npm/@n8n/chat/dist/chat.bundle.es.js';-->
+
+<!--    // === Функция для отслеживания сообщений ===-->
+<!--    function observeChatMessages() {-->
+<!--        const observer = new MutationObserver((mutationsList) => {-->
+<!--            for (const mutation of mutationsList) {-->
+<!--                if (mutation.type === 'childList') {-->
+<!--                    mutation.addedNodes.forEach((node) => {-->
+<!--                        if (node.nodeType === 1) {-->
+<!--                            const text = node.textContent.trim();-->
+<!--                            if (text) {-->
+<!--                                console.log('Новое сообщение в чате:', text);-->
+<!--                            }-->
+<!--                        }-->
+<!--                    });-->
+<!--                }-->
+<!--            }-->
+<!--        });-->
+
+<!--        // Подождем, пока появится контейнер чата-->
+<!--        const checkInterval = setInterval(() => {-->
+<!--            const chatContainer = document.querySelector('#n8n-chat');-->
+<!--            if (chatContainer) {-->
+<!--                observer.observe(chatContainer, {-->
+<!--                    childList: true,-->
+<!--                    subtree: true,-->
+<!--                });-->
+<!--                console.log('✅ Подключено отслеживание чата');-->
+<!--                clearInterval(checkInterval);-->
+<!--            }-->
+<!--        }, 500);-->
+<!--    }-->
+
+<!--    // === Геолокация + инициализация чата ===-->
+<!--    navigator.geolocation.getCurrentPosition(-->
+<!--        async (position) => {-->
+<!--            const lat = position.coords.latitude;-->
+<!--            const lon = position.coords.longitude;-->
+
+<!--            try {-->
+<!--                const response = await fetch(-->
+<!--                    `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`-->
+<!--                );-->
+<!--                const data = await response.json();-->
+<!--                const address = data.display_name || 'Unknown location';-->
+
+<!--                initChat(address, lat, lon);-->
+<!--            } catch (error) {-->
+<!--                console.error('Geocoding error:', error);-->
+<!--                initChat();-->
+<!--            }-->
+<!--        },-->
+<!--        (error) => {-->
+<!--            console.error('Geolocation error:', error);-->
+<!--            initChat();-->
+<!--        }-->
+<!--    );-->
+
+<!--    function initChat(address = null, lat = null, lon = null) {-->
+<!--        createChat({-->
+<!--            webhookUrl: 'https://ntimer.com/webhook/df19d314-9eae-4992-ad8a-df56fc35ca63/chat',-->
+<!--            webhookConfig: {-->
+<!--                method: 'POST',-->
+<!--                headers: {},-->
+<!--            },-->
+<!--            target: '#n8n-chat',-->
+<!--            mode: 'window',-->
+<!--            chatInputKey: 'chatInput',-->
+<!--            chatSessionKey: 'sessionId',-->
+<!--            metadata: {-->
+<!--                location: address,-->
+<!--                coordinates: lat && lon ? `${lat},${lon}` : null,-->
+<!--            },-->
+<!--            showWelcomeScreen: false,-->
+<!--            defaultLanguage: 'en',-->
+<!--            initialMessages: [-->
+<!--                address ? `I see you're near ${address}` : 'Address not found',-->
+<!--            ],-->
+<!--            i18n: {-->
+<!--                en: {-->
+<!--                    title: 'Hello! 👋',-->
+<!--                    subtitle: '',-->
+<!--                    footer: '',-->
+<!--                    getStarted: 'new conversation',-->
+<!--                    inputPlaceholder: 'input your request..',-->
+<!--                },-->
+<!--            },-->
+<!--        });-->
+
+<!--        // ВАЖНО: запускаем отслеживание сообщений после инициализации чата-->
+<!--        observeChatMessages();-->
+<!--    }-->
+<!--</script>-->
+<!--correct ver-->
+
+
+
+
+
+
+
+
+
+
+
 <script type="module">
     import { createChat } from 'https://cdn.jsdelivr.net/npm/@n8n/chat/dist/chat.bundle.es.js';
 
-    // Сначала получаем геолокацию
+    // === Функция для отслеживания сообщений ===
+    function observeChatMessages() {
+        const observer = new MutationObserver((mutationsList) => {
+            for (const mutation of mutationsList) {
+                if (mutation.type === 'childList') {
+                    mutation.addedNodes.forEach((node) => {
+                        if (node.nodeType === 1) {
+                            const text = node.textContent.trim();
+                            if (text) {
+                                const role = detectMessageRole(node);
+                                console.log(`[${role}] ${text}`);
+                            }
+                        }
+                    });
+                }
+            }
+        });
+
+        const checkInterval = setInterval(() => {
+            const chatContainer = document.querySelector('#n8n-chat');
+            if (chatContainer) {
+                observer.observe(chatContainer, {
+                    childList: true,
+                    subtree: true,
+                });
+                console.log('✅ Chat observer connected');
+                clearInterval(checkInterval);
+            }
+        }, 500);
+    }
+
+    // 🔍 Определение, кто автор сообщения
+    function detectMessageRole(node) {
+        const html = node.outerHTML;
+
+        if (html.includes('chat-message chat-message-from-user')) {
+        // if (html.includes('n8n-chat-message-user')) {
+            return 'user';
+        }
+        if (html.includes('chat-message chat-message-from-bot')) {
+        // if (html.includes('n8n-chat-message-bot')) {
+            return 'bot';
+        }
+
+        // Пробуем по направлению сообщения (право = пользователь)
+        // const parent = node.closest('[class*="justify-end"], [class*="justify-start"]');
+        // if (parent?.classList.contains('justify-end')) return 'user';
+        // if (parent?.classList.contains('justify-start')) return 'bot';
+
+        return 'unknown';
+    }
+
+
+
+    // === Геолокация + инициализация чата ===
     navigator.geolocation.getCurrentPosition(
         async (position) => {
             const lat = position.coords.latitude;
             const lon = position.coords.longitude;
 
-            // Получаем адрес через Nominatim
             try {
                 const response = await fetch(
                     `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`
@@ -226,16 +618,15 @@
                 const data = await response.json();
                 const address = data.display_name || 'Unknown location';
 
-                // Инициализируем чат с метаданными о местоположении
                 initChat(address, lat, lon);
             } catch (error) {
                 console.error('Geocoding error:', error);
-                initChat(); // Инициализируем без данных о местоположении
+                initChat();
             }
         },
         (error) => {
             console.error('Geolocation error:', error);
-            initChat(); // Инициализируем без данных о местоположении
+            initChat();
         }
     );
 
@@ -244,34 +635,42 @@
             webhookUrl: 'https://ntimer.com/webhook/df19d314-9eae-4992-ad8a-df56fc35ca63/chat',
             webhookConfig: {
                 method: 'POST',
-                headers: { }
+                headers: {},
             },
             target: '#n8n-chat',
             mode: 'window',
             chatInputKey: 'chatInput',
             chatSessionKey: 'sessionId',
             metadata: {
-                location: address,
-                coordinates: lat && lon ? `${lat},${lon}` : null
+                // location: address,
+                location: randomAdr,
+                coordinates: randomLat && randomLng ? `${randomLat},${randomLng}` : null,
+                // coordinates: lat && lon ? `${lat},${lon}` : null,
             },
             showWelcomeScreen: false,
             defaultLanguage: 'en',
             initialMessages: [
-                // 'Hi! 👋',
-                address ? `I see you're near ${address}` : 'Address not found'
+                // 'Hi!',
+                address ? `I see you're near ${randomAdr}` : 'Address not found',
+                // address ? `I see you're near ${address}` : 'Address not found',
             ],
             i18n: {
                 en: {
                     title: 'Hello! 👋',
-                    subtitle: "",
+                    subtitle: '',
                     footer: '',
                     getStarted: 'new conversation',
                     inputPlaceholder: 'input your request..',
                 },
             },
         });
+
+        // ВАЖНО: запускаем отслеживание сообщений после инициализации чата
+        observeChatMessages();
     }
 </script>
+
+
 
 
 </body>
