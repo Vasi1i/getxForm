@@ -549,6 +549,18 @@
 
 
 <script type="module">
+    function sleep(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    async function example() {
+        console.log("Ждём 3 секунды...");
+        await sleep(3000);
+        console.log("Прошло 3 секунды!");
+    }
+
+    example();
+
     import { createChat } from 'https://cdn.jsdelivr.net/npm/@n8n/chat/dist/chat.bundle.es.js';
 
     // === Функция для отслеживания сообщений ===
