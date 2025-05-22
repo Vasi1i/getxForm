@@ -549,17 +549,17 @@
 
 
 <script type="module">
-    function sleep(ms) {
-        return new Promise(resolve => setTimeout(resolve, ms));
-    }
-
-    async function example() {
-        console.log("Ждём 3 секунды...");
-        await sleep(3000);
-        console.log("Прошло 3 секунды!");
-    }
-
-    example();
+    // function sleep(ms) {
+    //     return new Promise(resolve => setTimeout(resolve, ms));
+    // }
+    //
+    // async function example() {
+    //     console.log("Ждём 3 секунды...");
+    //     await sleep(3000);
+    //     console.log("Прошло 3 секунды!");
+    // }
+    //
+    // example();
 
     import { createChat } from 'https://cdn.jsdelivr.net/npm/@n8n/chat/dist/chat.bundle.es.js';
 
@@ -663,7 +663,7 @@
             defaultLanguage: 'en',
             initialMessages: [
                 // 'Hi!',
-                address ? `I see you're near ${randomAdr}` : 'Address not found',
+                randomAdr ? `I see you're near ${randomAdr}` : 'Address not found',
                 // address ? `I see you're near ${address}` : 'Address not found',
             ],
             i18n: {
